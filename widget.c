@@ -5,15 +5,16 @@
 #include <time.h>
 
 
+int date_and_time[3];           // this arry stors min, hours, day of a week
 
-int get_current_time(){
+void get_current_time(){
 
     time_t t = time(NULL);
     struct tm date = *localtime(&t);        // get current time
     
-    int min = date.tm_min;                  // into variable min save value from tm_min
-    int hour = date.tm_hour;                // into variable hour save value from tm_hout
-    int day = date.tm_mday;                  // etc
+    date_and_time[0] = date.tm_min;         // into variable min save value from tm_min
+    date_and_time[1] = date.tm_hour;        // into variable hour save value from tm_hout
+    int day = date.tm_mday;                 // etc
     int mon = date.tm_mon + 1;
     int year = date.tm_year - 100;          // variable day of a week stors 0 number
     int day_of_week = 0;                    // the day of a week is calculated bellow
@@ -61,7 +62,7 @@ int get_current_time(){
 
     sum += year + year / 4;
     day_of_week = sum % 7;
-    printf("%d", day_of_week);
+    date_and_time[2] = day_of_week;
 
 }
 
