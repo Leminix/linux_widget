@@ -2,6 +2,17 @@
 #include <stdio.h>
 #include <errno.h>
 #include <fcntl.h>
+#include <time.h>
+
+
+
+int get_current_time(){
+
+    time_t t = time(NULL);
+    struct tm date = *localtime(&t);
+    printf("%d %d %d", date.tm_year, date.tm_mon, date.tm_mday);
+
+}
 
 
 
@@ -14,7 +25,7 @@ int create_connection(){
     }
 
 
-    // write a code which will get time and date from OS
+    get_current_time();
     // write a code which will call function to convert data to binary code
 
 
