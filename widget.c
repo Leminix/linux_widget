@@ -9,8 +9,59 @@
 int get_current_time(){
 
     time_t t = time(NULL);
-    struct tm date = *localtime(&t);
-    printf("%d %d %d", date.tm_year, date.tm_mon, date.tm_mday);
+    struct tm date = *localtime(&t);        // get current time
+    
+    int min = date.tm_min;                  // into variable min save value from tm_min
+    int hour = date.tm_hour;                // into variable hour save value from tm_hout
+    int day = date.tm_mday;                  // etc
+    int mon = date.tm_mon + 1;
+    int year = date.tm_year - 100;          // variable day of a week stors 0 number
+    int day_of_week = 0;                    // the day of a week is calculated bellow
+    int sum = 0;                            // sum is a tmp variable which helps calculate day of a week
+
+    sum += day + 6;                         // to sum add day and const 6. 6 is a code for year 2000 - 2099
+    switch(mon){                            // it means in 3000 this function will calculate wrong result
+        case 1:                             // add to sum a code of a month
+            sum += 0;
+        break;
+        case 2:
+            sum += 3;
+        break;
+        case 3:
+            sum += 3;
+        break;
+        case 4:
+            sum += 6;
+        break;
+        case 5:
+            sum += 1;
+        break;
+        case 6:
+            sum += 4;
+        break;
+        case 7:
+            sum += 6;
+        break;
+        case 8:
+            sum += 2;
+        break;
+        case 9:
+            sum += 5;
+        break;
+        case 10:
+            sum += 0;
+        break;
+        case 11:
+            sum += 3;
+        break;
+        case 12:
+            sum += 5;
+        break;
+    }
+
+    sum += year + year / 4;
+    day_of_week = sum % 7;
+    printf("%d", day_of_week);
 
 }
 
