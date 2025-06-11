@@ -9,11 +9,35 @@
 #include <string.h>
 #include <stdint.h>
 
+#include "days.c"
+
 
 int date_and_time[3];           // this arry stors min, hours, day of a week
 
 
-
+void draw_day_bitmap(uint8_t* fbmem, int x, int y,
+    struct fb_var_screeninfo vinfo,
+    struct fb_fix_screeninfo finfo,
+    uint32_t color,
+    uint8_t day_bitmap[3][8],
+    int scale) {
+    for (int ch = 0; ch < 3; ch++) {
+        for (int row = 0; row < 8; row++) {
+            for (int col = 0; col < 8; col++) {
+                if ((day_bitmap[ch][row] >> (7 - col)) & 1) {
+                    for (int dy = 0; dy < scale; dy++) {
+                        for (int dx = 0; dx < scale; dx++) {
+                            int px = x + ch * (8 * scale + scale) + col * scale + dx;
+                            int py = y + row * scale + dy;
+                            long location = py * finfo.line_length + px * (vinfo.bits_per_pixel / 8);
+                            *((uint32_t*)(fbmem + location)) = color;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
 
 
 void get_current_time(){
@@ -103,6 +127,31 @@ int create_connection(){
 
     uint32_t green = 0x0000FF00;            // green color
     // function that set pixel color *((uint32_t*)(number)) = green;
+	int x = 1100, y = 50;
+    switch (date_and_time[2]) {
+        case 1:
+            draw_day_bitmap(fbmem, x, y, vinfo, finfo, green, days_bitmap[0], 3);
+        break;
+        case 2:
+            draw_day_bitmap(fbmem, x, y, vinfo, finfo, green, days_bitmap[1], 3);
+        break;
+        case 3:
+            draw_day_bitmap(fbmem, x, y, vinfo, finfo, green, days_bitmap[2], 3);
+        break;
+        case 4:
+            draw_day_bitmap(fbmem, x, y, vinfo, finfo, green, days_bitmap[3], 3);
+        break;
+        case 5:
+            draw_day_bitmap(fbmem, x, y, vinfo, finfo, green, days_bitmap[4], 3);
+        break;
+        case 6:
+            draw_day_bitmap(fbmem, x, y, vinfo, finfo, green, days_bitmap[5], 3);
+        break;
+        case 7:
+            draw_day_bitmap(fbmem, x, y, vinfo, finfo, green, days_bitmap[6], 3);
+        break;
+    }
+
 
     munmap(fbmem, screensize);
     close(fb);          // close device 
