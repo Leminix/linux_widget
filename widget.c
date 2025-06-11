@@ -6,17 +6,13 @@
 #include <sys/ioctl.h>
 #include <sys/mman.h>
 #include <linux/fb.h>
+#include <string.h>
+#include <stdint.h>
 
 
 int date_and_time[3];           // this arry stors min, hours, day of a week
 
 
-
-void map_mem(int xres, int yres){
-
-    printf("%d %d", xres, yres);
-
-}
 
 
 
@@ -24,7 +20,7 @@ void get_current_time(){
 
     time_t t = time(NULL);
     struct tm date = *localtime(&t);        // get current time
-    
+
     date_and_time[0] = date.tm_min;         // into variable min save value from tm_min
     date_and_time[1] = date.tm_hour;        // into variable hour save value from tm_hout
     int day = date.tm_mday;                 // etc
@@ -82,25 +78,34 @@ void get_current_time(){
 
 
 int create_connection(){
-    
+
     int fb = open("/dev/fb0", O_RDWR);  // use open syscall to open fb0 device in path /dev
     if(fb < 0){                         // open it for read and write
         perror("ERROR");                // if the fb is less then 0 print an ERROR message
         return errno;
     }
 
-
-    get_current_time();                // this function gets current time and date from OS and calculate day of a week
+    get_current_time();                 // this function gets current time and date from OS and calculate day of a week
 
     struct fb_var_screeninfo vinfo;
-    ioctl (fb, FBIOGET_VSCREENINFO, &vinfo);
-    map_mem(vinfo.xres, vinfo.yres);               // and this function convers data (time and date) to binary data which can be write into frame buffer
+    struct fb_fix_screeninfo finfo;
 
+    ioctl(fb, FBIOGET_VSCREENINFO, &vinfo);
+    ioctl(fb, FBIOGET_FSCREENINFO, &finfo);
 
-    if(close(fb) < 0){          // close device and check returned value
-        perror("ERROR");        // if a value is less then 0 print an ERROR message
-        return errno;           // but if the value is 0 return 0 to main function
+    long screensize = vinfo.yres * finfo.line_length;
+
+    uint8_t* fbmem = mmap(0, screensize, PROT_READ | PROT_WRITE, MAP_SHARED, fb, 0);
+    if ((intptr_t)fbmem == -1) {
+        perror("mmap failed");
+        return errno;
     }
+
+    uint32_t green = 0x0000FF00;            // green color
+    // function that set pixel color *((uint32_t*)(number)) = green;
+
+    munmap(fbmem, screensize);
+    close(fb);          // close device 
 
     return 0;
 
