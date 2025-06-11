@@ -3,9 +3,22 @@
 #include <errno.h>
 #include <fcntl.h>
 #include <time.h>
+#include <sys/ioctl.h>
+#include <sys/mman.h>
+#include <linux/fb.h>
 
 
 int date_and_time[3];           // this arry stors min, hours, day of a week
+
+
+
+void map_mem(int xres, int yres){
+
+    printf("%d %d", xres, yres);
+
+}
+
+
 
 void get_current_time(){
 
@@ -77,8 +90,11 @@ int create_connection(){
     }
 
 
-    get_current_time();
-    // write a code which will call function to convert data to binary code
+    get_current_time();                // this function gets current time and date from OS and calculate day of a week
+
+    struct fb_var_screeninfo vinfo;
+    ioctl (fb, FBIOGET_VSCREENINFO, &vinfo);
+    map_mem(vinfo.xres, vinfo.yres);               // and this function convers data (time and date) to binary data which can be write into frame buffer
 
 
     if(close(fb) < 0){          // close device and check returned value
